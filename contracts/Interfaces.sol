@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: --🦉--
 
-pragma solidity =0.7.2;
+pragma solidity =0.7.4;
 
 interface IWiseToken {
 

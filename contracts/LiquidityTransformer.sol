@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: --🦉--
 
-pragma solidity =0.7.2;
+pragma solidity =0.7.4;
 
 /*
  __      __.___  ____________________
@@ -27,16 +27,23 @@ contract LiquidityTransformer is usingProvable {
     UniswapV2Pair public UNISWAP_PAIR;
 
     UniswapRouterV2 public constant UNISWAP_ROUTER = UniswapRouterV2(
-        0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D
+        // 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D // mainnet
+        // 0xf164fC0Ec4E93095b804a4795bBe1e041497b92a // ropsten
+        0x57079e0d0657890218C630DA5248A1103a1b4ad0 // local
     );
 
     RefundSponsorI public constant REFUND_SPONSOR = RefundSponsorI(
-        0xc3FC68dDdB1bf4Cb61307eEf89729DC317f2325a
+        // 0xc3FC68dDdB1bf4Cb61307eEf89729DC317f2325a // mainnet
+        // 0x025cA911ad05425EfA6D145944af85aB4E12778f // ropsten
+        0x7EDBCfFa2bBEdf72c34073C6786dE47299cD7368 // local
     );
 
-    address payable constant TEAM_ADDRESS = 0x88eCFE0a6428A104a8bde2f31aE771Ae4d37F6b4;
+    address payable constant TEAM_ADDRESS = 0xa803c226c8281550454523191375695928DcFE92;
     address public TOKEN_DEFINER = 0xa803c226c8281550454523191375695928DcFE92;
-    address constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+
+    // address constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2; // mainnet
+    // address constant WETH = 0xc778417E063141139Fce010982780140Aa0cD5Ab; // ropsten
+    address constant WETH = 0xEb59fE75AC86dF3997A990EDe100b90DDCf9a826; // local
 
     uint8 constant INVESTMENT_DAYS = 50;
 
@@ -219,8 +226,10 @@ contract LiquidityTransformer is usingProvable {
         WISE_CONTRACT = IWiseToken(_wiseToken);
         UNISWAP_PAIR = UniswapV2Pair(_uniswapPair);
 
+        OAR = OracleAddrResolverI(0x6f485C8BF6fc43eA212E93BBF8ce046C7f1cb475);
+
         provable_setProof(proofType_Ledger);
-        provable_setCustomGasPrice(100000000000);
+        provable_setCustomGasPrice(10000000000);
 
         dailyMinSupply[1] = 5000000;
         dailyMinSupply[2] = 5000000;
@@ -1063,11 +1072,14 @@ contract LiquidityTransformer is usingProvable {
       */
     function checkInvestmentDays(
         uint8[] memory _investmentDays,
-        uint64 _currentWiseDay
-    ) internal pure {
+        uint64 _wiseDay
+    )
+        internal
+        pure
+    {
         for (uint8 _i = 0; _i < _investmentDays.length; _i++) {
             require(
-                _investmentDays[_i] >= _currentWiseDay,
+                _investmentDays[_i] >= _wiseDay,
                 'WISE: investment day already passed'
             );
             require(
