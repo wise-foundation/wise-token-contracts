@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: --🦉--
 
-pragma solidity =0.7.4;
+pragma solidity =0.7.6;
 
 import "./LiquidityToken.sol";
 
@@ -8,19 +8,13 @@ contract WiseToken is LiquidityToken {
 
     address public LIQUIDITY_TRANSFORMER;
     address public transformerGateKeeper;
-    address payable public savingAddress;
 
     constructor() ERC20("Wise Token", "WISE") {
         transformerGateKeeper = msg.sender;
-        savingAddress = msg.sender;
     }
 
-    /**
-     * @notice donations are welcomed
-     * @dev goes to developers address
-     */
     receive() external payable {
-        savingAddress.transfer(msg.value);
+        revert();
     }
 
     /**
@@ -34,8 +28,8 @@ contract WiseToken is LiquidityToken {
         external
     {
         require(
-            transformerGateKeeper == msg.sender,
-            'WISE: transformer defined'
+            transformerGateKeeper == msg.sender
+            // 'WISE: transformer defined'
         );
         LIQUIDITY_TRANSFORMER = _immutableTransformer;
         transformerGateKeeper = address(0x0);
@@ -55,8 +49,8 @@ contract WiseToken is LiquidityToken {
         external
     {
         require(
-            msg.sender == LIQUIDITY_TRANSFORMER,
-            'WISE: wrong transformer'
+            msg.sender == LIQUIDITY_TRANSFORMER
+            // 'WISE: wrong transformer'
         );
 
         _mint(
@@ -76,8 +70,8 @@ contract WiseToken is LiquidityToken {
         external
     {
         require(
-            msg.sender == LIQUIDITY_TRANSFORMER,
-            'WISE: wrong transformer'
+            msg.sender == LIQUIDITY_TRANSFORMER
+            // 'WISE: wrong transformer'
         );
         criticalMass[_referrer].totalAmount = THRESHOLD_LIMIT;
         criticalMass[_referrer].activationDay = _nextWiseDay();
@@ -169,24 +163,6 @@ contract WiseToken is LiquidityToken {
             amounts[2],
             _lockDays,
             _referrer
-        );
-    }
-
-    /**
-     * @notice allows to save any stuck ERC20 from contract
-     * @dev if someone sends tokens into contract accidentally
-     * @param _tokenAddress any ERC20 token address
-     */
-    function saveTokens(
-        address _tokenAddress,
-        uint256 _tokenAmount
-    )
-        external
-    {
-        safeTransfer(
-            _tokenAddress,
-            savingAddress,
-            _tokenAmount
         );
     }
 }

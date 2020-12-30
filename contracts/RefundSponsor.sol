@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: --🦉--
 
-pragma solidity =0.7.4;
+pragma solidity =0.7.6;
 
 contract RefundSponsor {
 
@@ -109,7 +109,7 @@ contract RefundSponsor {
         view
         returns (uint256)
     {
-        return getRefundAmount(msg.sender) * payoutPercent / 100;
+        return getRefundAmount(msg.sender);
     }
 
     function getRefundAmount(address x)

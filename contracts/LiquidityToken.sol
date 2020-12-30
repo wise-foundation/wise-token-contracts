@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: --🦉--
 
-pragma solidity =0.7.4;
+pragma solidity =0.7.6;
 
 import "./StakingToken.sol";
 
 abstract contract LiquidityToken is StakingToken {
+
+    using SafeMath for uint;
 
     /**
      * @notice A method for a staker to create a liquidity stake
@@ -17,6 +19,11 @@ abstract contract LiquidityToken is StakingToken {
         external
         returns (bytes16 liquidityStakeID)
     {
+        require(
+            isLiquidityGuardActive == true
+            // WISE: LiquidityGuard is not active
+        );
+
         safeTransferFrom(
             address(UNISWAP_PAIR),
             msg.sender,
@@ -33,6 +40,9 @@ abstract contract LiquidityToken is StakingToken {
         newLiquidityStake.startDay = _nextWiseDay();
         newLiquidityStake.stakedAmount = _liquidityTokens;
         newLiquidityStake.isActive = true;
+
+        globals.liquidityShares =
+        globals.liquidityShares.add(_liquidityTokens);
 
         liquidityStakes[msg.sender][liquidityStakeID] = newLiquidityStake;
 
@@ -78,6 +88,9 @@ abstract contract LiquidityToken is StakingToken {
             liquidityStake.stakedAmount
         );
 
+        globals.liquidityShares =
+        globals.liquidityShares.sub(liquidityStake.stakedAmount);
+
         liquidityStakes[msg.sender][_liquidityStakeID] = liquidityStake;
 
         return liquidityStake.rewardAmount;
@@ -121,7 +134,7 @@ abstract contract LiquidityToken is StakingToken {
         view
         returns (uint256 _rewardAmount)
     {
-        uint256 maxCalculationDay = _liquidityStake.startDay + MAX_BONUS_DAYS_A;
+        uint256 maxCalculationDay = _liquidityStake.startDay + MIN_REFERRAL_DAYS;
 
         uint256 calculationDay =
             globals.currentWiseDay < maxCalculationDay ?

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: --🦉--
 
-pragma solidity =0.7.4;
+pragma solidity =0.7.6;
 
 import "./ReferralToken.sol";
 
@@ -9,9 +9,32 @@ abstract contract StakingToken is ReferralToken {
     using SafeMath for uint256;
 
     /**
+     * @notice A method for a staker to create multiple stakes
+     * @param _stakedAmount amount of WISE staked.
+     * @param _lockDays amount of days it is locked for.
+     * @param _referrer address of the referrer
+     */
+    function createStakeBulk(
+        uint256[] memory _stakedAmount,
+        uint64[] memory _lockDays,
+        address[] memory _referrer
+    )
+        external
+    {
+        for(uint256 i = 0; i < _stakedAmount.length; i++) {
+            createStake(
+                _stakedAmount[i],
+                _lockDays[i],
+                _referrer[i]
+            );
+        }
+    }
+
+    /**
      * @notice A method for a staker to create a stake
      * @param _stakedAmount amount of WISE staked.
      * @param _lockDays amount of days it is locked for.
+     * @param _referrer address of the referrer
      */
     function createStake(
         uint256 _stakedAmount,
@@ -32,6 +55,11 @@ abstract contract StakingToken is ReferralToken {
             _lockDays >= MIN_LOCK_DAYS &&
             _lockDays <= MAX_LOCK_DAYS
             // 'WISE: stake is not in range'
+        );
+
+        require(
+            _stakedAmount >= MIN_STAKE_AMOUNT
+            // 'WISE: stake is not large enough'
         );
 
         (
@@ -210,7 +238,7 @@ abstract contract StakingToken is ReferralToken {
         _sharePriceUpdate(
             endedStake.stakedAmount > penaltyAmount ?
             endedStake.stakedAmount - penaltyAmount : 0,
-            endedStake.rewardAmount,
+            endedStake.rewardAmount + scrapes[msg.sender][_stakeID],
             endedStake.referrer,
             endedStake.lockDays,
             endedStake.stakesShares
@@ -249,9 +277,9 @@ abstract contract StakingToken is ReferralToken {
         _stake = stakes[_staker][_stakeID];
         _stake.closeDay = _currentWiseDay();
         _stake.rewardAmount = _calculateRewardAmount(_stake);
-        _stake.isActive = false;
+        _penalty = _calculatePenaltyAmount(_stake);
 
-        _penalty = _detectPenalty(_stake);
+        _stake.isActive = false;
 
         _mint(
             _staker,
@@ -347,15 +375,27 @@ abstract contract StakingToken is ReferralToken {
                 stakersPenalty,
                 referrerPenalty
             );
-        }
 
-        _sharePriceUpdate(
-            stake.stakedAmount,
-            scrapeAmount,
-            stake.referrer,
-            stake.lockDays,
-            stake.stakesShares
-        );
+            _sharePriceUpdate(
+                stake.stakedAmount,
+                scrapeAmount,
+                stake.referrer,
+                stake.lockDays,
+                stake.stakesShares
+            );
+        }
+        else {
+            scrapes[msg.sender][_stakeID] =
+            scrapes[msg.sender][_stakeID].add(scrapeAmount);
+
+            _sharePriceUpdate(
+                stake.stakedAmount,
+                scrapes[msg.sender][_stakeID],
+                stake.referrer,
+                stake.lockDays,
+                stake.stakesShares
+            );
+        }
 
         stake.scrapeDay = scrapeDay;
         stakes[msg.sender][_stakeID] = stake;
@@ -427,9 +467,18 @@ abstract contract StakingToken is ReferralToken {
             );
 
             if (newSharePrice > globals.sharePrice) {
-                globals.sharePrice =
+
+                newSharePrice =
                     newSharePrice < globals.sharePrice.mul(110).div(100) ?
                     newSharePrice : globals.sharePrice.mul(110).div(100);
+
+                emit NewSharePrice(
+                    newSharePrice,
+                    globals.sharePrice,
+                    _currentWiseDay()
+                );
+
+                globals.sharePrice = newSharePrice;
             }
 
             return;
@@ -486,7 +535,7 @@ abstract contract StakingToken is ReferralToken {
             uint256 startDay,
             uint256 lockDays,
             uint256 finalDay,
-            uint256 daysLeft,
+            uint256 closeDay,
             uint256 scrapeDay,
             uint256 stakedAmount,
             uint256 stakesShares,
@@ -500,12 +549,12 @@ abstract contract StakingToken is ReferralToken {
         startDay = stake.startDay;
         lockDays = stake.lockDays;
         finalDay = stake.finalDay;
+        closeDay = stake.closeDay;
         scrapeDay = stake.scrapeDay;
-        daysLeft = _daysLeft(stake);
         stakedAmount = stake.stakedAmount;
         stakesShares = stake.stakesShares;
         rewardAmount = _checkRewardAmount(stake);
-        penaltyAmount = _detectPenalty(stake);
+        penaltyAmount = _calculatePenaltyAmount(stake);
         isActive = stake.isActive;
         isMature = _isMatureStake(stake);
     }
@@ -608,15 +657,11 @@ abstract contract StakingToken is ReferralToken {
     }
 
     function _checkRewardAmount(Stake memory _stake) private view returns (uint256) {
-        return _stake.rewardAmount == 0 ? _detectReward(_stake) : _stake.rewardAmount;
+        return _stake.isActive ? _detectReward(_stake) : _stake.rewardAmount;
     }
 
     function _detectReward(Stake memory _stake) private view returns (uint256) {
         return _stakeNotStarted(_stake) ? 0 : _calculateRewardAmount(_stake);
-    }
-
-    function _detectPenalty(Stake memory _stake) private view returns (uint256) {
-        return _stakeEnded(_stake) ? 0 : _calculatePenaltyAmount(_stake);
     }
 
     function _storePenalty(
@@ -638,7 +683,7 @@ abstract contract StakingToken is ReferralToken {
         view
         returns (uint256)
     {
-        return _stakeNotStarted(_stake) ? 0 : _getPenalties(_stake);
+        return _stakeNotStarted(_stake) || _isMatureStake(_stake) ? 0 : _getPenalties(_stake);
     }
 
     function _getPenalties(Stake memory _stake)
@@ -658,7 +703,7 @@ abstract contract StakingToken is ReferralToken {
     {
         return _loopRewardAmount(
             _stake.stakesShares,
-            _startingDay(_stake), 
+            _startingDay(_stake),
             _calculationDay(_stake)
         );
     }

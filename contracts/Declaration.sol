@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: --🦉--
 
-pragma solidity =0.7.4;
+pragma solidity =0.7.6;
 
 import "./Global.sol";
 
@@ -37,7 +37,7 @@ interface IUniswapRouterV2 {
         uint amountOutMin,
         address[] calldata path,
         address to,
-        uint deadlin
+        uint deadline
     ) external payable returns (
         uint[] memory amounts
     );
@@ -51,23 +51,7 @@ interface IUniswapV2Pair {
         uint32 blockTimestampLast
     );
 
-    function transfer(
-        address to,
-        uint256 value
-    ) external returns (bool);
-
-    function transferFrom(
-        address from,
-        address to,
-        uint256 value
-    ) external returns (bool);
-
-    function balanceOf(
-        address owner
-    ) external view returns (uint256);
-
     function token1() external view returns (address);
-    function totalSupply() external view returns (uint256);
 }
 
 interface ILiquidityGuard {
@@ -208,6 +192,7 @@ abstract contract Declaration is Global {
     mapping(address => uint256) public liquidityStakeCount;
 
     mapping(address => CriticalMass) public criticalMass;
+    mapping(address => mapping(bytes16 => uint256)) public scrapes;
     mapping(address => mapping(bytes16 => Stake)) public stakes;
     mapping(address => mapping(bytes16 => ReferrerLink)) public referrerLinks;
     mapping(address => mapping(bytes16 => LiquidityStake)) public liquidityStakes;

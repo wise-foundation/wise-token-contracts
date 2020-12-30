@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: --🦉--
 
-pragma solidity =0.7.4;
+pragma solidity =0.7.6;
 
 import "./Helper.sol";
 
@@ -194,10 +194,7 @@ abstract contract Snapshot is Helper {
             // reusing scheduledToEndToday variable
 
             lSnapShot memory lsnapshot = lsnapshots[_day];
-
-            lsnapshot.totalShares = UNISWAP_PAIR.balanceOf(
-                address(this)
-            );
+            lsnapshot.totalShares = globals.liquidityShares;
 
             lsnapshot.inflationAmount = lsnapshot.totalShares
                 .mul(PRECISION_RATE).div(

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: --🦉--
 
-pragma solidity =0.7.4;
+pragma solidity =0.7.6;
 
 import "./ERC20.sol";
 import "./Events.sol";
@@ -15,6 +15,7 @@ abstract contract Global is ERC20, Events {
         uint256 sharePrice;
         uint256 currentWiseDay;
         uint256 referralShares;
+        uint256 liquidityShares;
     }
 
     Globals public globals;
@@ -78,8 +79,8 @@ abstract contract Global is ERC20, Events {
             globals.totalShares,
             globals.totalStaked,
             globals.sharePrice,
-            globals.currentWiseDay,
-            globals.referralShares
+            globals.referralShares,
+            globals.currentWiseDay
         );
     }
 }

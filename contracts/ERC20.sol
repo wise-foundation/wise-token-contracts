@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: --🦉--
 
-pragma solidity =0.7.4;
+pragma solidity =0.7.6;
 
 contract Context {
 
@@ -154,15 +154,16 @@ contract ERC20 is Context {
         public
         returns (bool)
     {
-        _transfer(
-            sender,
-            recipient,
-            amount
-        );
         _approve(sender,
             _msgSender(), _allowances[sender][_msgSender()].sub(
                 amount
             )
+        );
+
+        _transfer(
+            sender,
+            recipient,
+            amount
         );
         return true;
     }
@@ -186,13 +187,11 @@ contract ERC20 is Context {
         virtual
     {
         require(
-            sender != address(0x0),
-            'ERC20: transfer from the zero address'
+            sender != address(0x0)
         );
 
         require(
-            recipient != address(0x0),
-            'ERC20: transfer to the zero address'
+            recipient != address(0x0)
         );
 
         _balances[sender] =
@@ -224,8 +223,7 @@ contract ERC20 is Context {
         virtual
     {
         require(
-            account != address(0x0),
-            'ERC20: mint to the zero address'
+            account != address(0x0)
         );
 
         _totalSupply =
@@ -239,6 +237,18 @@ contract ERC20 is Context {
             account,
             amount
         );
+    }
+
+    /**
+     * @dev Allows to burn tokens if token sender
+     * wants to reduce totalSupply() of the token
+     */
+    function burn(
+        uint256 amount
+    )
+        external
+    {
+        _burn(msg.sender, amount);
     }
 
     /**
@@ -260,8 +270,7 @@ contract ERC20 is Context {
         virtual
     {
         require(
-            account != address(0x0),
-            'ERC20: burn from the zero address'
+            account != address(0x0)
         );
 
         _balances[account] =

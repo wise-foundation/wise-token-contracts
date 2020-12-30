@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: --🦉--
 
-pragma solidity =0.7.4;
+pragma solidity =0.7.6;
 
 contract Events {
 
@@ -56,7 +56,8 @@ contract Events {
 
     event NewSharePrice(
         uint256 newSharePrice,
-        bytes32 stakeID
+        uint256 oldSharePrice,
+        uint64 currentWiseDay
     );
 
     event UniswapReserves(

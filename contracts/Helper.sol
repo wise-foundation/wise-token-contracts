@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: --🦉--
 
-pragma solidity =0.7.4;
+pragma solidity =0.7.6;
 
 import "./Timing.sol";
 
@@ -40,40 +40,6 @@ abstract contract Helper is Timing {
 
     function generateLiquidityStakeID(address _staker) internal view returns (bytes16 liquidityStakeID) {
         return generateID(_staker, liquidityStakeCount[_staker], 0x03);
-    }
-
-    function activeStakesCount(
-        address _staker
-    )
-        external
-        view
-        returns (
-            uint256 activeCount
-        )
-    {
-        for (uint256 _stakeIndex = 0; _stakeIndex <= stakeCount[_staker]; _stakeIndex++) {
-            bytes16 _stakeID = generateID(_staker, _stakeIndex - 1, 0x01);
-            if (stakes[_staker][_stakeID].isActive) {
-                activeCount++;
-            }
-        }
-    }
-
-    function activeReferralCount(
-        address _referrer
-    )
-        external
-        view
-        returns (
-            uint256 activeCount
-        )
-    {
-        for (uint256 _rIndex = 0; _rIndex <= referralCount[_referrer]; _rIndex++) {
-            bytes16 _rID = generateID(_referrer, _rIndex - 1, 0x02);
-            if (referrerLinks[_referrer][_rID].isActive) {
-                activeCount++;
-            }
-        }
     }
 
     function stakesPagination(
@@ -159,7 +125,9 @@ abstract contract Helper is Timing {
     }
 
     function _isMatureStake(Stake memory _stake) internal view returns (bool) {
-        return _stake.finalDay <= globals.currentWiseDay;
+        return _stake.closeDay > 0
+            ? _stake.finalDay <= _stake.closeDay
+            : _stake.finalDay <= _currentWiseDay();
     }
 
     function _notCriticalMassReferrer(address _referrer) internal view returns (bool) {
@@ -167,7 +135,9 @@ abstract contract Helper is Timing {
     }
 
     function _stakeNotStarted(Stake memory _stake) internal view returns (bool) {
-        return _stake.startDay > globals.currentWiseDay;
+        return _stake.closeDay > 0
+            ? _stake.startDay > _stake.closeDay
+            : _stake.startDay > _currentWiseDay();
     }
 
     function _stakeEnded(Stake memory _stake) internal view returns (bool) {
@@ -175,7 +145,9 @@ abstract contract Helper is Timing {
     }
 
     function _daysLeft(Stake memory _stake) internal view returns (uint256) {
-        return _stakeEnded(_stake) ? 0 : _daysDiff(_currentWiseDay(), _stake.finalDay);
+        return _stake.isActive == false
+            ? _daysDiff(_stake.closeDay, _stake.finalDay)
+            : _daysDiff(_currentWiseDay(), _stake.finalDay);
     }
 
     function _daysDiff(uint256 _startDate, uint256 _endDate) internal pure returns (uint256) {
