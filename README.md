@@ -7,25 +7,23 @@
  \        /|   |/        \ |        \
   \__/\  / |___/_______  //_______  /
        \/              \/         \/
-
-The Wise Foundation is an unincorporated nonprofit association formed in February 2020.
-The WISE contract and various related software and websites are being wholly funded and
-developed by The Wise Foundation.
 ```
 
-#### This public repo contains the WISE Token smart contracts.
+#### This public repo contains the WISE (Wise Token on Ethereum) smart contracts.
 
-Main WISE links:
-* [Official Website](https://ilovewise.com/)
-* [White Paper](https://wisewhitepaper.com/)
+## Author
+* [Vitally Marinchenko](https://github.com/vm06007)
 
-Social links:
+### Main links:
+* [Official Website](https://wisetoken.net/)
+* [White Paper](https://wisetoken.net/teal)
+
+### Social links:
 * [Telegram](https://t.me/WiseToken/)
+* [Discord](https://discord.gg/keJUb4W)
 * [YouTube](https://www.youtube.com/channel/UCkrhXAz9MIpCARoZ0SeibDA)
-* [Official Twitter](https://twitter.com/wise_token)
-* [CoffeeConverter's (CTO) Twitter](https://twitter.com/CoffeeConverter)
+* [Twitter](https://twitter.com/wise_token)
 * [Facebook](https://www.facebook.com/wisetokens)
 * [Instagram](https://www.instagram.com/wisetoken/)
-* [Reddit](https://www.reddit.com/user/wisetoken)
-* [Discord](https://discord.com/channels/727513630332944504/727513630332944508)
+* [Reddit](https://www.reddit.com/user/WiseTokenOfficial)
 * [Gitter](https://gitter.im/WiseToken/community)
