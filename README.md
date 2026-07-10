@@ -15,15 +15,10 @@
 * [Vitally Marinchenko](https://github.com/vm06007)
 
 ### Main links:
-* [Official Website](https://wisetoken.net/)
+* [Official Website](https://wisetoken.com/)
 * [White Paper](https://wisetoken.net/teal)
 
 ### Social links:
-* [Telegram](https://t.me/WiseToken/)
-* [Discord](https://discord.gg/keJUb4W)
-* [YouTube](https://www.youtube.com/channel/UCkrhXAz9MIpCARoZ0SeibDA)
+* [Discord]([https://discord.gg/keJUb4W](https://discord.gg/uuGPUwYKu3))
 * [Twitter](https://twitter.com/wise_token)
-* [Facebook](https://www.facebook.com/wisetokens)
-* [Instagram](https://www.instagram.com/wisetoken/)
-* [Reddit](https://www.reddit.com/user/WiseTokenOfficial)
-* [Gitter](https://gitter.im/WiseToken/community)
+
