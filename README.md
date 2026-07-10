@@ -19,6 +19,4 @@
 * [White Paper](https://wisetoken.net/teal)
 
 ### Social links:
-* [Discord]([https://discord.gg/keJUb4W](https://discord.gg/uuGPUwYKu3))
 * [Twitter](https://twitter.com/wise_token)
-
